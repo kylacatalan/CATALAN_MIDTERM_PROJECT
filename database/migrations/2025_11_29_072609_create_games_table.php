@@ -18,6 +18,7 @@ return new class extends Migration
             $table->string('developer');
             $table->string('publisher');
             $table->decimal('rating', 2,1);
+            $table->string('photo')->nullable();
             $table->timestamps();
         });
     }

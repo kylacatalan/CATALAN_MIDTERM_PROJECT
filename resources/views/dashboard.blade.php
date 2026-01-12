@@ -40,11 +40,26 @@
                     @endif
                 </div>
             </div>
-
         </div>
 
         <div class="relative h-full flex-1 overflow-hidden rounded-xl border border-cyan-800 bg-gradient-to-b from-gray-900 via-gray-800 to-gray-950 dark:border-cyan-900">
             <div class="flex h-full flex-col p-6">
+
+                <div class="flex h-full flex-col p-6">
+                <div class="mb-4 flex justify-end">
+                    <form method="GET" action="{{ route('games.export') }}" class="inline">
+                        <input type="hidden" name="search" value="{{ request('search') }}">
+                        <input type="hidden" name="genre_filter" value="{{ request('genre_filter') }}">
+
+                        <button type="submit"
+                                class="flex items-center gap-2 rounded-lg bg-green-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-green-700">
+                            <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                            </svg>
+                            Export to PDF
+                        </button>
+                    </form>
+                </div>
                 
                 <div class="mb-6 rounded-lg border border-cyan-700 bg-gray-800/70 p-6 shadow-xl">
                     <h2 class="mb-4 text-lg font-semibold text-cyan-400">Add New Game</h2>
@@ -120,10 +135,80 @@
                             @enderror
                         </div>
 
+                        <!-- Photo Upload -->
+                        <div class="md:col-span-2">
+                            <label class="mb-2 block text-sm font-medium text-neutral-700 dark:text-neutral-300">
+                                Game Photo (Optional)
+                            </label>
+                            <input
+                                type="file"
+                                name="photo"
+                                accept="image/jpeg,image/png,image/jpg"
+                                class="w-full rounded-lg border border-neutral-300 bg-white px-4 py-2 text-sm file:mr-4 file:rounded-md file:border-0 file:bg-blue-50 file:px-4 file:py-2 file:text-sm file:font-medium file:text-blue-700 hover:file:bg-blue-100 dark:border-neutral-600 dark:bg-neutral-800 dark:text-neutral-100 dark:file:bg-blue-900/20 dark:file:text-blue-400"
+                            >
+                            <p class="mt-1 text-xs text-neutral-500 dark:text-neutral-400">
+                                JPG, PNG or JPEG. Max 2MB.
+                            </p>
+                            @error('photo')
+                                <p class="mt-1 text-xs text-red-600 dark:text-red-400">{{ $message }}</p>
+                            @enderror
+                        </div>
+
                         <div class="md:col-span-2">
                             <button type="submit" class="rounded-lg bg-cyan-600 px-6 py-2 text-sm font-medium text-white transition-colors hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-cyan-500/40">
                                 Add Game
                             </button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Search & Filter Section -->
+                <div class="rounded-xl border mb-10 border-neutral-200 bg-white p-6 dark:border-neutral-700 dark:bg-neutral-800">
+                    <h2 class="mb-4 text-lg font-semibold text-neutral-900 dark:text-neutral-100">Search & Filter Game</h2>
+
+                    <form action="{{ route('dashboard') }}" method="GET" class="grid gap-4 md:grid-cols-3">
+                        <!-- Search Input -->
+                        <div class="md:col-span-1">
+                            <label class="mb-2 block text-sm font-medium text-neutral-700 dark:text-neutral-300">Search</label>
+                            <input
+                                type="text"
+                                name="search"
+                                value="{{ request('search') }}"
+                                placeholder="Search by game name, publisher, or developer"
+                                class="w-full rounded-lg border border-neutral-300 bg-white px-4 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 dark:border-neutral-600 dark:bg-neutral-800 dark:text-neutral-100"
+                            >
+                        </div>
+
+                        <!-- Course Filter Dropdown -->
+                        <div class="md:col-span-1">
+                            <label class="mb-2 block text-sm font-medium text-neutral-700 dark:text-neutral-300">Filter by Course</label>
+                            <select
+                                name="course_filter"
+                                class="w-full rounded-lg border border-neutral-300 bg-white px-4 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 dark:border-neutral-600 dark:bg-neutral-800 dark:text-neutral-100"
+                            >
+                                <option value="">All Genre</option>
+                                @foreach($genres as $genre)
+                                    <option value="{{ $genre->id }}" {{ request('genre_filter') == $genre->id ? 'selected' : '' }}>
+                                        {{ $genre->name }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
+
+                        <!-- Action Buttons -->
+                        <div class="flex items-end gap-2 md:col-span-1">
+                            <button
+                                type="submit"
+                                class="flex-1 rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-700"
+                            >
+                                Apply Filters
+                            </button>
+                            <a
+                                href="{{ route('dashboard') }}"
+                                class="rounded-lg border border-neutral-300 px-4 py-2 text-sm font-medium text-neutral-700 transition-colors hover:bg-neutral-100 dark:border-neutral-600 dark:text-neutral-300 dark:hover:bg-neutral-700"
+                            >
+                                Clear
+                            </a>
                         </div>
                     </form>
                 </div>
@@ -135,6 +220,7 @@
                             <thead>
                                 <tr class="border-b border-cyan-700 bg-gray-800/70">
                                     <th class="px-4 py-3 text-sm font-semibold text-cyan-200">#</th>
+                                    <th class="px-4 py-3 text-sm font-semibold text-cyan-200">Photo</th>
                                     <th class="px-4 py-3 text-sm font-semibold text-cyan-200">Game Name</th>
                                     <th class="px-4 py-3 text-sm font-semibold text-cyan-200">Genre</th>
                                     <th class="px-4 py-3 text-sm font-semibold text-cyan-200">Release Year</th>
@@ -148,6 +234,19 @@
                                 @forelse($games as $game) {{-- Renamed $movies to $game for semantic clarity, assuming the variable name wasn't changed in the controller --}}
                                     <tr class="transition-colors hover:bg-gray-800/50" id="game-row-{{ $game->id }}">
                                         <td class="px-4 py-3 text-sm text-gray-400">{{ $loop->iteration }}</td>
+                                        <td class="px-4 py-3">
+                                            @if($game->photo)
+                                                <img
+                                                    src="{{ Storage::url($game->photo) }}"
+                                                    alt="{{ $game->name }}"
+                                                    class="h-12 w-12 rounded-full object-cover ring-2 ring-blue-100 dark:ring-blue-900"
+                                                >
+                                            @else
+                                                <div class="flex h-12 w-12 items-center justify-center rounded-full bg-blue-100 text-sm font-semibold text-blue-600 dark:bg-blue-900/30 dark:text-blue-400">
+                                                    {{ strtoupper(substr($game->name, 0, 2)) }}
+                                                </div>
+                                            @endif
+                                        </td>
                                         <td class="px-4 py-3 text-sm font-medium text-white">
                                             <span class="game-name-display">{{ $game->name }}</span> {{-- NOTE: Kept $game->title assuming 'title' holds the game name from DB --}}
                                         </td>
@@ -174,7 +273,7 @@
                                                 '{{ $game->release_year }}',
                                                 '{{ addslashes($game->developer) }}',
                                                 '{{ addslashes($game->publisher) }}',
-                                                '{{ $game->rating }}'
+                                                '{{ $game->rating }}', '{{ $game->photo }}',
                                             );" class="text-cyan-400 transition-colors hover:text-cyan-300">
                                                 Edit
                                             </button>
@@ -190,7 +289,7 @@
                                     </tr>
                                 @empty
                                     <tr>
-                                        <td colspan="9" class="px-4 py-8 text-center text-sm text-cyan-300">
+                                        <td colspan="10" class="px-4 py-8 text-center text-sm text-cyan-300">
                                             No games found. Add your first game above!
                                         </td>
                                     </tr>
@@ -206,7 +305,7 @@
 <div id="editGameModal" class="fixed inset-0 hidden items-center justify-center bg-black/70 z-[9999]">
     <div class="w-full max-w-2xl rounded-xl border border-cyan-700 bg-gray-800 p-6 shadow-2xl">
         <h2 class="mb-4 text-lg font-semibold text-cyan-400">Edit Game</h2>
-        <form id="editGameForm" method="POST">
+        <form id="editGameForm" enctype="multipart/form-data" method="POST">
             @csrf
             @method('PUT')
             <div class="grid gap-4 md:grid-cols-2">
@@ -251,10 +350,24 @@
                     <input type="number" id="edit_ratings" name="rating" step="0.1" min="0.0" max="5.0"
                            class="w-full rounded-lg border border-cyan-600 bg-gray-900 px-4 py-2 text-sm text-white focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/30">
                 </div>
-            </div>
-            <div class="mt-6 flex justify-end gap-3">
-                <button type="button" onclick="closeEditModal()" class="rounded-lg border border-cyan-600 px-4 py-2 text-sm font-medium text-cyan-300 hover:bg-gray-700">Cancel</button>
-                <button type="submit" class="rounded-lg bg-cyan-600 px-4 py-2 text-sm font-medium text-white hover:bg-cyan-700">Update Game</button>
+                <!-- Current Photo Preview -->
+                <div id="currentPhotoPreview" class="mb-3"></div>
+
+                    <input
+                        type="file"
+                        id="edit_photo"
+                        name="photo"
+                        accept="image/jpeg,image/png,image/jpg"
+                        class="w-full rounded-lg border border-neutral-300 bg-white px-4 py-2 text-sm file:mr-4 file:rounded-md file:border-0 file:bg-blue-50 file:px-4 file:py-2 file:text-sm file:font-medium file:text-blue-700 hover:file:bg-blue-100 dark:border-neutral-600 dark:bg-neutral-800 dark:text-neutral-100 dark:file:bg-blue-900/20 dark:file:text-blue-400"
+                    >
+                    <p class="mt-1 text-xs text-neutral-500 dark:text-neutral-400">
+                        Leave empty to keep current photo. JPG, PNG or JPEG. Max 2MB.
+                    </p>
+                </div>
+                <div class="mt-6 flex justify-end gap-3">
+                    <button type="button" onclick="closeEditModal()" class="rounded-lg border border-cyan-600 px-4 py-2 text-sm font-medium text-cyan-300 hover:bg-gray-700">Cancel</button>
+                    <button type="submit" class="rounded-lg bg-cyan-600 px-4 py-2 text-sm font-medium text-white hover:bg-cyan-700">Update Game</button>
+                </div>
             </div>
         </form>
     </div>
@@ -262,7 +375,7 @@
 
 {{-- NOTE: Updated Javascript function name and parameters --}}
 <script>
-    function editGame(id, name, genre_id, release_year, developer, publisher, rating) {
+    function editGame(id, name, genre_id, release_year, developer, publisher, rating, photo) {
         document.getElementById('editGameModal').classList.remove('hidden');
         document.getElementById('editGameModal').classList.add('flex');
         document.getElementById('editGameForm').action = `/games/${id}`; // NOTE: Updated route path
@@ -273,6 +386,25 @@
         document.getElementById('edit_developer').value = developer;
         document.getElementById('edit_publisher').value = publisher;
         document.getElementById('edit_ratings').value = rating;
+
+        const photoPreview = document.getElementById('currentPhotoPreview');
+        if (photo) {
+            photoPreview.innerHTML = `
+                <div class="flex items-center gap-3 rounded-lg border border-neutral-200 p-3 dark:border-neutral-700">
+                    <img src="/storage/${photo}" alt="${name}" class="h-16 w-16 rounded-full object-cover">
+                    <div>
+                        <p class="text-sm font-medium text-neutral-700 dark:text-neutral-300">Current Photo</p>
+                        <p class="text-xs text-neutral-500 dark:text-neutral-400">Upload new photo to replace</p>
+                    </div>
+                </div>
+            `;
+        } else {
+            photoPreview.innerHTML = `
+                <div class="rounded-lg border border-dashed border-neutral-300 p-4 text-center dark:border-neutral-600">
+                    <p class="text-sm text-neutral-500 dark:text-neutral-400">No photo uploaded</p>
+                </div>
+            `;
+        }
     }
 
     function closeEditModal() {

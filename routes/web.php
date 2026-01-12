@@ -22,6 +22,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/games', [GameController::class, 'store'])->name('games.store');
     Route::put('/games/{game}', [GameController::class, 'update'])->name('games.update');
     Route::delete('/games/{game}', [GameController::class, 'destroy'])->name('games.destroy');
+    Route::get('/games/export', [GameController::class, 'export'])->name('games.export');
 });
 
 Route::middleware(['auth', 'verified'])->group(function () {

@@ -16,6 +16,7 @@ class Game extends Model
         'developer',
         'publisher',
         'rating',
+        'photo',
     ];
 
     public function genre()
